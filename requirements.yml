@@ -1,0 +1,5 @@
+---
+# No external collections required — all modules used are ansible.builtin.
+# Keep this file so `ansible-galaxy collection install -r requirements.yml`
+# stays a harmless no-op for future additions.
+collections: []

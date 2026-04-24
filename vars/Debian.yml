@@ -1,0 +1,7 @@
+---
+base_packages:
+  - git
+  - curl
+  - tar
+  - bzip2
+  - ca-certificates

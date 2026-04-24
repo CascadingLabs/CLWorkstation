@@ -1,0 +1,105 @@
+---
+# Install each tool from vars/tools.yml into ~/.local/bin.
+#
+# Strategy per tool:
+#   1. Skip if sentinel file exists at cache/<name>-<version>.installed
+#   2. Extract the upstream archive into a per-tool staging dir
+#   3. Copy the binary (item.bin_in_archive) into ~/.local/bin/<bin_name>
+#   4. Write the sentinel
+#
+# Neovim is special-cased: the full tree is kept under ~/.local/share/nvim-linux64
+# and nvim is symlinked into ~/.local/bin.
+
+- name: Check sentinel for each tool
+  ansible.builtin.stat:
+    path: "{{ user_cache_dir }}/{{ item.name }}-{{ item.version }}.installed"
+  loop: "{{ tools }}"
+  loop_control:
+    label: "{{ item.name }}-{{ item.version }}"
+  register: _tool_sentinels
+
+- name: Build list of tools still needing install
+  ansible.builtin.set_fact:
+    tools_to_install: >-
+      {{ _tool_sentinels.results
+         | rejectattr('stat.exists')
+         | map(attribute='item')
+         | list }}
+
+- name: Report pending installs
+  ansible.builtin.debug:
+    msg: "Installing: {{ tools_to_install | map(attribute='name') | list }}"
+  when: tools_to_install | length > 0
+
+- name: Create per-tool staging dirs
+  ansible.builtin.file:
+    path: "{{ user_cache_dir }}/staging/{{ item.name }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Extract archives into staging
+  ansible.builtin.unarchive:
+    src: "{{ item.url }}"
+    dest: "{{ user_cache_dir }}/staging/{{ item.name }}"
+    remote_src: true
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name != "neovim"
+
+# --- neovim: keep the tree, symlink the binary ----------------------------
+
+- name: Install neovim tree under ~/.local/share
+  ansible.builtin.unarchive:
+    src: "{{ item.url }}"
+    dest: "{{ ansible_env.HOME }}/.local/share"
+    remote_src: true
+    creates: "{{ ansible_env.HOME }}/.local/share/nvim-linux64"
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name == "neovim"
+
+- name: Symlink nvim into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.local/share/nvim-linux64/bin/nvim"
+    dest: "{{ user_bin_dir }}/nvim"
+    state: link
+    force: true
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name == "neovim"
+
+# --- everyone else: copy the one binary from staging ----------------------
+
+- name: Copy binaries into ~/.local/bin
+  ansible.builtin.copy:
+    src: "{{ user_cache_dir }}/staging/{{ item.name }}/{{ item.bin_in_archive }}"
+    dest: "{{ user_bin_dir }}/{{ item.bin_name | default(item.name) }}"
+    mode: "0755"
+    remote_src: true
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name != "neovim"
+
+- name: Clean up staging dirs
+  ansible.builtin.file:
+    path: "{{ user_cache_dir }}/staging/{{ item.name }}"
+    state: absent
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Write sentinel files
+  ansible.builtin.copy:
+    dest: "{{ user_cache_dir }}/{{ item.name }}-{{ item.version }}.installed"
+    content: "{{ item.url }}\n"
+    mode: "0644"
+  loop: "{{ tools_to_install }}"
+  loop_control:
+    label: "{{ item.name }}-{{ item.version }}"

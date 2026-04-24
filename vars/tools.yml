@@ -1,0 +1,83 @@
+---
+# Each entry describes one tool downloaded from a GitHub release (or similar).
+# The `tools` role loops this list. All installs are per-user into ~/.local/bin.
+#
+# Fields:
+#   name          — logical name; also used for the sentinel file
+#   version       — pinned version string (no leading 'v' unless the URL needs it)
+#   url           — full download URL, may reference {{ arch }} / {{ version }}
+#   archive_type  — tar.gz | tar.xz | tar.bz2 | zip | raw  (raw = single binary)
+#   bin_in_archive— path inside the archive to the binary(-ies) to install; may
+#                   be a list. Ignored when archive_type is 'raw'.
+#   bin_name      — final name under ~/.local/bin (defaults to `name`)
+
+tools:
+  - name: ripgrep
+    version: "14.1.1"
+    url: "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "ripgrep-14.1.1-x86_64-unknown-linux-musl/rg"
+    bin_name: rg
+
+  - name: fd
+    version: "10.2.0"
+    url: "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "fd-v10.2.0-x86_64-unknown-linux-musl/fd"
+
+  - name: bat
+    version: "0.24.0"
+    url: "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "bat-v0.24.0-x86_64-unknown-linux-musl/bat"
+
+  - name: eza
+    version: "0.20.24"
+    url: "https://github.com/eza-community/eza/releases/download/v0.20.24/eza_x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "./eza"
+
+  - name: fzf
+    version: "0.56.3"
+    url: "https://github.com/junegunn/fzf/releases/download/v0.56.3/fzf-0.56.3-linux_amd64.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "fzf"
+
+  - name: zoxide
+    version: "0.9.6"
+    url: "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.6/zoxide-0.9.6-x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "zoxide"
+
+  - name: starship
+    version: "1.21.1"
+    url: "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-unknown-linux-musl.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "starship"
+
+  - name: btop
+    version: "1.4.0"
+    url: "https://github.com/aristocratos/btop/releases/download/v1.4.0/btop-x86_64-linux-musl.tbz"
+    archive_type: tar.bz2
+    bin_in_archive: "btop/bin/btop"
+
+  - name: lazygit
+    version: "0.44.1"
+    url: "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_x86_64.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "lazygit"
+
+  - name: lazydocker
+    version: "0.23.3"
+    url: "https://github.com/jesseduffield/lazydocker/releases/download/v0.23.3/lazydocker_0.23.3_Linux_x86_64.tar.gz"
+    archive_type: tar.gz
+    bin_in_archive: "lazydocker"
+
+  - name: neovim
+    version: "0.10.2"
+    url: "https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz"
+    archive_type: tar.gz
+    # nvim ships as a tree; we install the whole thing under ~/.local/share
+    # and symlink the binary. Handled specially in roles/tools/tasks/main.yml.
+    bin_in_archive: "nvim-linux64/bin/nvim"
+    bin_name: nvim

@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# Starship prompt + zoxide. Both are gated so missing binaries don't break login.
+
+command -v starship >/dev/null && eval "$(starship init bash)"
+command -v zoxide   >/dev/null && eval "$(zoxide init bash)"

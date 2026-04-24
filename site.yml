@@ -1,0 +1,27 @@
+---
+- name: Apply Cascading Labs workstation loadout
+  hosts: workstations
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    - name: Load distro-specific vars
+      ansible.builtin.include_vars: "{{ item }}"
+      with_first_found:
+        - "vars/{{ ansible_os_family }}.yml"
+        - "vars/default.yml"
+      tags: always
+
+    - name: Load tool catalog
+      ansible.builtin.include_vars: vars/tools.yml
+      tags: always
+
+  roles:
+    - role: common
+      tags: [common]
+    - role: tools
+      tags: [tools]
+    - role: shell
+      tags: [shell]
+    - role: neovim
+      tags: [neovim]

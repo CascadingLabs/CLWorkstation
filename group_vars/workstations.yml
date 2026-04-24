@@ -1,0 +1,9 @@
+---
+# Feature toggles — flip to false to skip a role's work for all hosts.
+enable_shell_rc: true
+enable_neovim_config: true
+
+# Where per-user binaries land. Must be on PATH (shell role ensures this).
+user_bin_dir: "{{ ansible_env.HOME }}/.local/bin"
+user_config_dir: "{{ ansible_env.HOME }}/.config"
+user_cache_dir: "{{ ansible_env.HOME }}/.cache/clworkstation"

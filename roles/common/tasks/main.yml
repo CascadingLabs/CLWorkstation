@@ -1,0 +1,30 @@
+---
+- name: Ensure per-user directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ user_bin_dir }}"
+    - "{{ user_config_dir }}"
+    - "{{ user_cache_dir }}"
+    - "{{ ansible_env.HOME }}/.bashrc.d"
+    - "{{ ansible_env.HOME }}/.local/share"
+
+# Best-effort: if we happen to have sudo, make sure base packages are present.
+# If not, skip silently — the tools role downloads static binaries anyway.
+- name: Install base packages (only if we have sudo)
+  become: true
+  ansible.builtin.package:
+    name: "{{ base_packages }}"
+    state: present
+  when: base_packages | length > 0
+  register: _base_pkg_result
+  failed_when: false
+
+- name: Note if base packages could not be installed
+  ansible.builtin.debug:
+    msg: >-
+      Base packages were not installed (no sudo or package manager issue).
+      This is fine — CLWorkstation installs tools as static binaries.
+  when: _base_pkg_result is failed

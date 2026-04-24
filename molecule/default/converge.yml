@@ -1,0 +1,30 @@
+---
+- name: Converge — run the full CLWorkstation play
+  hosts: all
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    # Molecule containers may not have a normal $HOME/user setup; make sure
+    # the user running ansible has HOME set so `~/.local/bin` expands correctly.
+    - name: Ensure HOME is set
+      ansible.builtin.set_fact:
+        ansible_env: "{{ ansible_env | combine({'HOME': ansible_env.HOME | default('/root')}) }}"
+
+    - name: Load distro-specific vars
+      ansible.builtin.include_vars: "{{ item }}"
+      with_first_found:
+        - "../../vars/{{ ansible_os_family }}.yml"
+        - "../../vars/default.yml"
+
+    - name: Load tool catalog
+      ansible.builtin.include_vars: ../../vars/tools.yml
+
+    - name: Load group_vars
+      ansible.builtin.include_vars: ../../group_vars/workstations.yml
+
+  roles:
+    - role: common
+    - role: tools
+    - role: shell
+    - role: neovim

@@ -1,0 +1,37 @@
+name: molecule
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [default]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install molecule + ansible
+        run: |
+          uv tool install ansible-core
+          uv tool install 'molecule[docker]' --with molecule-plugins
+
+      - name: Run molecule
+        working-directory: molecule/${{ matrix.scenario }}
+        run: uvx molecule test

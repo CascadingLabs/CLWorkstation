@@ -1,0 +1,28 @@
+---
+- name: Back up existing ~/.bashrc once
+  ansible.builtin.copy:
+    src: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "{{ ansible_env.HOME }}/.bashrc.pre-clworkstation"
+    remote_src: true
+    force: false
+  failed_when: false
+  when: enable_shell_rc
+
+- name: Template ~/.bashrc
+  ansible.builtin.template:
+    src: bashrc.j2
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+    mode: "0644"
+    backup: false
+  when: enable_shell_rc
+
+- name: Template ~/.bashrc.d/ fragments
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.bashrc.d/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0644"
+  loop:
+    - aliases.sh.j2
+    - fzf.sh.j2
+    - starship.sh.j2
+  when: enable_shell_rc

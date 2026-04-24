@@ -1,0 +1,25 @@
+---
+# Install the LazyVim starter config into ~/.config/nvim, but only if the
+# user doesn't already have one. We never overwrite an existing nvim config.
+
+- name: Configure neovim
+  when: enable_neovim_config
+  block:
+    - name: Check for existing nvim config
+      ansible.builtin.stat:
+        path: "{{ user_config_dir }}/nvim"
+      register: _nvim_cfg
+
+    - name: Clone LazyVim starter
+      ansible.builtin.git:
+        repo: https://github.com/LazyVim/starter.git
+        dest: "{{ user_config_dir }}/nvim"
+        depth: 1
+        version: main
+      when: not _nvim_cfg.stat.exists
+
+    - name: Drop the starter's .git so the user can init their own repo later
+      ansible.builtin.file:
+        path: "{{ user_config_dir }}/nvim/.git"
+        state: absent
+      when: not _nvim_cfg.stat.exists

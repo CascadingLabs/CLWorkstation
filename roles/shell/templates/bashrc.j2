@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+# Managed by CLWorkstation — edit roles/shell/templates/bashrc.j2, then rerun
+# `ansible-playbook site.yml --tags shell`.
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# Ensure ~/.local/bin is on PATH (CLWorkstation installs tools there)
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# Load all drop-in fragments (aliases, fzf, starship, …)
+if [ -d "$HOME/.bashrc.d" ]; then
+  for f in "$HOME"/.bashrc.d/*.sh; do
+    [ -r "$f" ] && . "$f"
+  done
+  unset f
+fi
+
+# Readline bindings
+bind '"\e\e": "\C-asudo \C-e"' 2>/dev/null
+bind '"\C-h": backward-kill-word' 2>/dev/null

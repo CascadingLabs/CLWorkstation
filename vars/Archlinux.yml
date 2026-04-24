@@ -1,0 +1,9 @@
+---
+# Minimal base packages assumed already present or installable via pacman.
+# These are only used if the `common` role needs to ensure them.
+base_packages:
+  - git
+  - curl
+  - tar
+  - bzip2
+  - ca-certificates

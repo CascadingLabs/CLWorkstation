@@ -1,0 +1,70 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Initial Checks
+      options:
+        - label: I'm using the latest version of CLWorkstation
+          required: true
+        - label: I've searched existing issues before opening this one
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        A clear description of the bug. Include what happened and what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: |
+        Provide the exact command you ran and the play/role involved.
+      placeholder: |
+        1. `ansible-playbook site.yml --limit <host> --tags tools`
+        2. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Ansible Output
+      description: Paste the failing task output (use `-v` or `-vv` for more detail).
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: ansible-version
+    attributes:
+      label: Ansible Version
+      description: Output of `ansible --version`
+      placeholder: e.g., ansible-core 2.18.0
+    validations:
+      required: true
+
+  - type: input
+    id: target-os
+    attributes:
+      label: Target OS
+      description: The distro + version of the server being provisioned.
+      placeholder: e.g., Arch Linux rolling, Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: input
+    id: control-os
+    attributes:
+      label: Control-Node OS
+      description: The distro + version you're running `ansible-playbook` from.
+      placeholder: e.g., Arch Linux, macOS 15
+    validations:
+      required: true

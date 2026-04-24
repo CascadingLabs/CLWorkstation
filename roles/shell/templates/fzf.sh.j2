@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+# fzf + fd integration. Safe to source even if fzf/fd aren't installed yet.
+
+if command -v fd >/dev/null; then
+  export FD_THREADS=$(nproc 2>/dev/null || echo 4)
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .venv --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .venv --exclude .git'
+fi
+
+# Load fzf key bindings + completion if fzf's shell-integration files exist.
+# (Upstream release tarballs don't ship these; users who want them can run
+#  `fzf --bash > ~/.bashrc.d/fzf-bindings.sh` once.)
+[ -r "$HOME/.bashrc.d/fzf-bindings.sh" ] && . "$HOME/.bashrc.d/fzf-bindings.sh"

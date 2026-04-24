@@ -1,0 +1,81 @@
+# {{ ansible_managed }}
+# Aliases — sanitized from Andrew's laptop bashrc for server use.
+# Laptop-only aliases (pnpm/bun/minikube/zeditor/wl-copy/…) are gated
+# behind `command -v` so the same rc is safe on any server.
+
+# --- Git -------------------------------------------------------------------
+alias gs='git status -sb'
+alias ga='git add'
+alias gc='git commit -m'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gb='git branch'
+alias gd='git diff'
+alias gom='git pull origin main'
+alias gp='git push'
+alias gl='git pull'
+alias gpf='git push --force-with-lease'
+alias gundo='git reset --soft HEAD~1'
+alias gnuke='git clean -fd && git reset --hard HEAD'
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+command -v gh >/dev/null && alias ghpc='gh pr checkout'
+command -v gh >/dev/null && alias gas='gh auth switch'
+
+# --- Modern Unix overrides (only if the replacement is installed) ----------
+command -v eza >/dev/null && {
+  alias l='eza --icons --group-directories-first'
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -lh --icons --git'
+}
+command -v bat >/dev/null && alias cat='bat'
+command -v rg  >/dev/null && alias grep='rg'
+command -v fd  >/dev/null && alias find='fd'
+
+alias please='sudo $(history -p !!)'
+command -v lazydocker >/dev/null && alias lz='lazydocker'
+command -v lazygit    >/dev/null && alias lg='lazygit'
+
+# --- Python / uv -----------------------------------------------------------
+command -v uv >/dev/null && {
+  alias ur='uv run'
+  alias urp='uv run poe'
+  alias urm='uv run manage.py'
+  alias urrs='uv run manage.py runserver'
+  alias urmm='uv run manage.py makemigrations'
+  alias urmg='uv run manage.py migrate'
+  alias urrl='uv run manage.py runlocal'
+  alias us='uv sync'
+  alias usg='uv sync --all-groups'
+}
+
+# --- Node / pnpm / bun (laptop-only — gated) -------------------------------
+command -v pnpm >/dev/null && {
+  alias p='pnpm'
+  alias px='pnpm dlx'
+  alias pi='pnpm install'
+  alias pd='pnpm dev'
+  alias pb='pnpm build'
+  alias pp='pnpm preview'
+}
+command -v bun >/dev/null && {
+  alias b='bun'
+  alias bx='bunx'
+  alias bi='bun install'
+  alias bd='bun dev'
+  alias bb='bun run build'
+  alias bp='bun run preview'
+}
+
+# --- Kubernetes ------------------------------------------------------------
+command -v minikube >/dev/null && alias kubectl='minikube kubectl'
+command -v minikube >/dev/null && alias kb='minikube kubectl'
+command -v k9s      >/dev/null && alias k9='k9s'
+
+# --- Editor (servers usually don't have zed) -------------------------------
+command -v zeditor >/dev/null && alias z='zeditor'
+command -v nvim    >/dev/null && alias ne='nvim .env'
+
+# --- Note on renamed aliases ----------------------------------------------
+# Laptop bashrc had `gp` defined twice (git push AND gemini prompt).
+# On servers we keep `gp=git push`. If you want gemini:
+command -v gemini >/dev/null && alias gmp='gemini prompt'

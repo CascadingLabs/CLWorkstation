@@ -1,0 +1,14 @@
+---
+# Copy this file to inventory/hosts.yml and edit for your servers.
+# hosts.yml is gitignored so your real hostnames stay private.
+
+workstations:
+  hosts:
+    web-1:
+      ansible_host: 192.0.2.10
+      ansible_user: andrew
+    db-1:
+      ansible_host: 192.0.2.11
+      ansible_user: andrew
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

@@ -1,0 +1,46 @@
+---
+- name: Verify CLWorkstation install
+  hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Binaries exist and are executable
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
+      register: _bin
+      failed_when: not _bin.stat.exists or not _bin.stat.executable
+      loop:
+        - rg
+        - fd
+        - bat
+        - eza
+        - fzf
+        - zoxide
+        - starship
+        - btop
+        - lazygit
+        - lazydocker
+        - nvim
+
+    - name: bashrc.d fragments installed
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.bashrc.d/{{ item }}"
+      register: _frag
+      failed_when: not _frag.stat.exists
+      loop:
+        - aliases.sh
+        - fzf.sh
+        - starship.sh
+
+    - name: gs alias resolves via interactive bash
+      ansible.builtin.shell: bash -ic 'alias gs'
+      register: _alias_gs
+      changed_when: false
+      failed_when: "'git status -sb' not in _alias_gs.stdout"
+
+    - name: LazyVim starter was cloned
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.config/nvim/init.lua"
+      register: _nvim
+      failed_when: not _nvim.stat.exists
