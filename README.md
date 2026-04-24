@@ -19,6 +19,13 @@ Ansible playbook that installs a consistent SSH toolkit on any Linux server (Arc
 
 Nothing lands outside `$HOME`, so coworkers sharing the box are untouched.
 
+## How it runs
+
+CLWorkstation runs in Ansible's **remote mode**: Ansible lives on your laptop
+(the *control node*) and configures servers over SSH. Targets need only SSH
+access and Python — nothing is installed on them beyond the tools in the
+playbook itself. There's no agent, no daemon, and no open port besides SSH.
+
 ## One-time control-node setup
 
 ```bash
