@@ -2,7 +2,7 @@
 - name: Verify CLWorkstation install
   hosts: all
   become: false
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Binaries exist and are executable

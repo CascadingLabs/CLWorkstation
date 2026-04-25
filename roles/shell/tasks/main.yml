@@ -1,12 +1,39 @@
 ---
+- name: Check for the bashrc-backup sentinel
+  ansible.builtin.stat:
+    path: "{{ user_cache_dir }}/bashrc-backed-up"
+  register: _bashrc_sentinel
+  when: enable_shell_rc
+
+- name: Check whether a pre-existing ~/.bashrc is present to back up
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+  register: _bashrc_current
+  when:
+    - enable_shell_rc
+    - not _bashrc_sentinel.stat.exists
+
 - name: Back up existing ~/.bashrc once
   ansible.builtin.copy:
     src: "{{ ansible_env.HOME }}/.bashrc"
     dest: "{{ ansible_env.HOME }}/.bashrc.pre-clworkstation"
     remote_src: true
-    force: false
-  failed_when: false
-  when: enable_shell_rc
+    mode: "0644"
+  when:
+    - enable_shell_rc
+    - not _bashrc_sentinel.stat.exists
+    - _bashrc_current.stat.exists | default(false)
+
+- name: Mark bashrc backup decision as done (sentinel)
+  ansible.builtin.file:
+    path: "{{ user_cache_dir }}/bashrc-backed-up"
+    state: touch
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+  when:
+    - enable_shell_rc
+    - not _bashrc_sentinel.stat.exists
 
 - name: Template ~/.bashrc
   ansible.builtin.template:

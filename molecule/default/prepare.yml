@@ -1,0 +1,22 @@
+---
+- name: Prepare — bootstrap interpreters and base packages on bare images
+  hosts: all
+  gather_facts: false
+  become: false
+
+  tasks:
+    # archlinux:latest ships no python, so setup/package modules can't run.
+    # Use raw to install python and the base_packages we need before converge.
+    - name: Bootstrap Arch (raw — no python yet)
+      ansible.builtin.raw: |
+        pacman -Sy --noconfirm --needed python git curl tar bzip2 ca-certificates
+      when: inventory_hostname == 'cl-arch'
+      changed_when: true
+
+    # geerlingguy ubuntu image has python3 but no apt cache and no git.
+    - name: Bootstrap Ubuntu (raw — refresh apt cache, install git)
+      ansible.builtin.raw: |
+        apt-get update -qq
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git curl tar bzip2 ca-certificates
+      when: inventory_hostname == 'cl-ubuntu'
+      changed_when: true

@@ -81,7 +81,7 @@ CLWorkstation/
 │   ├── tools/                  ← downloads + installs binaries from tools.yml
 │   ├── shell/                  ← templates bashrc + .bashrc.d/*.sh
 │   └── neovim/                 ← clones LazyVim starter if absent
-├── molecule/default/           ← Arch + Ubuntu container tests
+├── molecule/default/           ← Arch + Ubuntu container tests (prepare → converge → verify)
 └── media/                      ← logo assets (see Assets repo conventions)
 ```
 
@@ -92,11 +92,37 @@ file under `~/.cache/clworkstation/` on the target, then rerun the playbook.
 
 ## Local testing
 
+Molecule and the Docker driver no longer ship as a single package, and
+`uv tool` puts each tool in its own venv. Install both into one env so
+`molecule` can find `ansible-config` and the docker plugin at runtime:
+
 ```bash
-uv tool install 'molecule[docker]' molecule-plugins
-cd molecule/default
+uv tool install --force molecule \
+  --with 'molecule-plugins[docker]' \
+  --with docker \
+  --with ansible
+```
+
+Then run from the **repo root** (not from `molecule/default/`), with the
+molecule tool's bin on `PATH` so `ansible-config` resolves:
+
+```bash
+export PATH="$HOME/.local/share/uv/tools/molecule/bin:$PATH"
 molecule test   # Arch + Ubuntu containers → converge → idempotence → verify
 ```
+
+Useful sub-commands during development:
+
+```bash
+molecule converge          # apply once, leave containers running
+molecule login -h cl-arch  # shell into a converged container
+molecule verify            # re-run verify.yml only
+molecule destroy           # tear down
+```
+
+A `prepare.yml` runs before `converge.yml` and bootstraps python on the bare
+Arch image and refreshes apt + installs `git` on the Ubuntu image — both are
+prerequisites that the playbook itself assumes a real workstation already has.
 
 ## Adding a new tool
 
