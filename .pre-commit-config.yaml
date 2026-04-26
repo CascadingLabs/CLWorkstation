@@ -1,3 +1,4 @@
+---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -23,8 +24,8 @@ repos:
     rev: v24.10.0
     hooks:
       - id: ansible-lint
-        # Let ansible-lint auto-discover files based on ansible config +
-        # inventory. Overriding `files:` broke detection of vars/* as dicts.
+      # Let ansible-lint auto-discover files based on ansible config +
+      # inventory. Overriding `files:` broke detection of vars/* as dicts.
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0

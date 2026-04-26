@@ -1,0 +1,10 @@
+---
+# Conventions used throughout this repo that we don't enforce via lint:
+#  - register vars use a leading underscore (_foo) to mark them private to
+#    the task block, instead of the role-name prefix ansible-lint suggests.
+#  - verify.yml task names sometimes start lowercase to match the thing
+#    they're asserting (e.g. "gs alias resolves...").
+skip_list:
+  - var-naming[no-role-prefix]
+  - name[casing]
+  - command-instead-of-shell

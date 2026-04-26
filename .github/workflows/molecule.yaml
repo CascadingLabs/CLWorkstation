@@ -1,3 +1,4 @@
+---
 name: molecule
 
 on:
@@ -27,11 +28,22 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Install molecule + ansible
+      - name: Install molecule + ansible + docker driver
+        # molecule no longer ships a `docker` extra; the driver lives in
+        # molecule-plugins. Install both into the same uv tool env so
+        # molecule's subprocess calls (ansible-config, etc.) resolve.
         run: |
-          uv tool install ansible-core
-          uv tool install 'molecule[docker]' --with molecule-plugins
+          uv tool install --force molecule \
+            --with 'molecule-plugins[docker]' \
+            --with docker \
+            --with ansible
 
       - name: Run molecule
-        working-directory: molecule/${{ matrix.scenario }}
-        run: uvx molecule test
+        env:
+          # Override the project ansible.cfg's removed community.general.yaml
+          # callback. New ansible-core ships its own yaml result format.
+          ANSIBLE_STDOUT_CALLBACK: default
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+        run: |
+          export PATH="$HOME/.local/share/uv/tools/molecule/bin:$PATH"
+          molecule test -s ${{ matrix.scenario }}
