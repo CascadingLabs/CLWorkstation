@@ -11,6 +11,28 @@
     - "{{ ansible_env.HOME }}/.bashrc.d"
     - "{{ ansible_env.HOME }}/.local/share"
 
+- name: Ensure ~/.ssh exists with safe permissions
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: "0700"
+
+- name: Ensure ~/.ssh/authorized_keys exists with safe permissions
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh/authorized_keys"
+    state: touch
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+
+- name: Authorize my SSH public key for this user
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/authorized_keys"
+    line: "{{ lookup('ansible.builtin.file', 'id_ed25519.pub') | trim }}"
+    create: false
+    state: present
+    mode: "0600"
+
 # Best-effort: if we happen to have sudo, make sure base packages are present.
 # If not, skip silently — the tools role downloads static binaries anyway.
 - name: Install base packages (only if we have sudo)
