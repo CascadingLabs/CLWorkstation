@@ -39,7 +39,7 @@ $EDITOR inventory/hosts.yml    # add your servers
 
 ```bash
 # Dry run against one host:
-ansible-playbook site.yml --limit web-1 --check --diff
+ansible-playbook site.yml --limit <hostname> --check --diff --ask-become-pass
 
 # Real run, all hosts:
 ansible-playbook site.yml
@@ -53,7 +53,7 @@ ansible-playbook site.yml --tags shell
 | Path                                    | Contents                             |
 |-----------------------------------------|--------------------------------------|
 | `~/.local/bin/`                         | Static binaries (rg, fd, btop, …)    |
-| `~/.local/share/nvim-linux64/`          | Full neovim install                  |
+| `~/.local/share/nvim-linux-x86_64/`     | Full neovim install                  |
 | `~/.config/nvim/`                       | LazyVim starter (only if absent)     |
 | `~/.bashrc`                             | Thin rc that sources `~/.bashrc.d/*` |
 | `~/.bashrc.d/{aliases,fzf,starship}.sh` | Templated shell fragments            |

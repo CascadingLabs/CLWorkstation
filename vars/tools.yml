@@ -68,16 +68,16 @@ tools:
     bin_in_archive: "lazygit"
 
   - name: lazydocker
-    version: "0.23.3"
-    url: "https://github.com/jesseduffield/lazydocker/releases/download/v0.23.3/lazydocker_0.23.3_Linux_x86_64.tar.gz"
+    version: "0.24.2"
+    url: "https://github.com/jesseduffield/lazydocker/releases/download/v0.24.2/lazydocker_0.24.2_Linux_x86_64.tar.gz"
     archive_type: tar.gz
     bin_in_archive: "lazydocker"
 
   - name: neovim
-    version: "0.10.2"
-    url: "https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz"
+    version: "0.11.2"
+    url: "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz"
     archive_type: tar.gz
     # nvim ships as a tree; we install the whole thing under ~/.local/share
     # and symlink the binary. Handled specially in roles/tools/tasks/main.yml.
-    bin_in_archive: "nvim-linux64/bin/nvim"
+    bin_in_archive: "nvim-linux-x86_64/bin/nvim"
     bin_name: nvim

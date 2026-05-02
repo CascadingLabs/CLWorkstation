@@ -7,7 +7,7 @@
 #   3. Copy the binary (item.bin_in_archive) into ~/.local/bin/<bin_name>
 #   4. Write the sentinel
 #
-# Neovim is special-cased: the full tree is kept under ~/.local/share/nvim-linux64
+# Neovim is special-cased: the full tree is kept under ~/.local/share/nvim-linux-x86_64
 # and nvim is symlinked into ~/.local/bin.
 
 - name: Check sentinel for each tool
@@ -57,7 +57,7 @@
     src: "{{ item.url }}"
     dest: "{{ ansible_env.HOME }}/.local/share"
     remote_src: true
-    creates: "{{ ansible_env.HOME }}/.local/share/nvim-linux64"
+    creates: "{{ ansible_env.HOME }}/.local/share/nvim-linux-x86_64"
   loop: "{{ tools_to_install }}"
   loop_control:
     label: "{{ item.name }}"
@@ -65,7 +65,7 @@
 
 - name: Symlink nvim into ~/.local/bin
   ansible.builtin.file:
-    src: "{{ ansible_env.HOME }}/.local/share/nvim-linux64/bin/nvim"
+    src: "{{ ansible_env.HOME }}/.local/share/nvim-linux-x86_64/bin/nvim"
     dest: "{{ user_bin_dir }}/nvim"
     state: link
     force: true
