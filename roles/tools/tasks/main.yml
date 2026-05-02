@@ -31,6 +31,12 @@
     msg: "Installing: {{ tools_to_install | map(attribute='name') | list }}"
   when: tools_to_install | length > 0
 
+- name: Ensure staging parent dir exists
+  ansible.builtin.file:
+    path: "{{ user_cache_dir }}/staging"
+    state: directory
+    mode: "0755"
+
 - name: Create per-tool staging dirs
   ansible.builtin.file:
     path: "{{ user_cache_dir }}/staging/{{ item.name }}"
