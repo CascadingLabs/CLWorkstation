@@ -44,3 +44,23 @@
         path: "{{ ansible_env.HOME }}/.config/nvim/init.lua"
       register: _nvim
       failed_when: not _nvim.stat.exists
+
+    - name: Nerd Font .ttf files were installed
+      ansible.builtin.find:
+        paths: "{{ ansible_env.HOME }}/.local/share/fonts/JetBrainsMono"
+        patterns: "*.ttf"
+        recurse: true
+      register: _font_files
+      failed_when: _font_files.matched == 0
+
+    - name: Font sentinel was written
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.cache/clworkstation/font-JetBrainsMono-3.4.0.installed"
+      register: _font_sentinel
+      failed_when: not _font_sentinel.stat.exists
+
+    - name: fontconfig sees the JetBrainsMono Nerd Font
+      ansible.builtin.command: fc-list
+      register: _fc_list
+      changed_when: false
+      failed_when: "'JetBrainsMono Nerd Font' not in _fc_list.stdout"

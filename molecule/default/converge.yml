@@ -20,11 +20,15 @@
     - name: Load tool catalog
       ansible.builtin.include_vars: ../../vars/tools.yml
 
+    - name: Load font catalog
+      ansible.builtin.include_vars: ../../vars/fonts.yml
+
     - name: Load group_vars
       ansible.builtin.include_vars: ../../group_vars/workstations.yml
 
   roles:
     - role: common
     - role: tools
+    - role: fonts
     - role: shell
     - role: neovim
