@@ -16,11 +16,17 @@
       ansible.builtin.include_vars: vars/tools.yml
       tags: always
 
+    - name: Load font catalog
+      ansible.builtin.include_vars: vars/fonts.yml
+      tags: always
+
   roles:
     - role: common
       tags: [common]
     - role: tools
       tags: [tools]
+    - role: fonts
+      tags: [fonts]
     - role: shell
       tags: [shell]
     - role: neovim

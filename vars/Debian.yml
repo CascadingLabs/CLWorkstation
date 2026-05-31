@@ -4,4 +4,6 @@ base_packages:
   - curl
   - tar
   - bzip2
+  - xz-utils
   - ca-certificates
+  - fontconfig

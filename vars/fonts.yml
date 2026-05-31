@@ -1,0 +1,18 @@
+---
+# Nerd Fonts installed per-user into ~/.local/share/fonts.
+# The `fonts` role loops this list. No system packages, no sudo.
+#
+# These mirror Omarchy's default monospace font (the `ttf-jetbrains-mono-nerd`
+# package), so servers render the same glyphs/powerline icons our prompts,
+# eza, lazygit, btop, etc. expect.
+#
+# Fields:
+#   name     — logical name; also the sentinel name + staging subdir under fonts
+#   version  — pinned Nerd Fonts release tag (no leading 'v')
+#   url      — release archive URL. Use .tar.xz so `tar` can extract it without
+#              pulling in an `unzip` dependency.
+
+nerd_fonts:
+  - name: JetBrainsMono
+    version: "3.4.0"
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz"

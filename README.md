@@ -15,7 +15,7 @@
 
 # CLWorkstation
 
-Ansible playbook that installs a consistent SSH toolkit on any Linux server (Arch or Ubuntu) **per-user** — no root required for the tools themselves. One command and a fresh server has `lazydocker`, `btop`, `nvim` (+ LazyVim), `lazygit`, `ripgrep`, `fd`, `fzf`, `bat`, `eza`, `zoxide`, `starship`, plus a tested bash alias set.
+Ansible playbook that installs a consistent SSH toolkit on any Linux server (Arch or Ubuntu) **per-user** — no root required for the tools themselves. One command and a fresh server has `lazydocker`, `btop`, `nvim` (+ LazyVim), `lazygit`, `ripgrep`, `fd`, `fzf`, `bat`, `eza`, `zoxide`, `starship`, the **JetBrainsMono Nerd Font** (Omarchy's default, so prompts/icons render correctly), plus a tested bash alias set.
 
 Nothing lands outside `$HOME`, so coworkers sharing the box are untouched.
 
@@ -34,6 +34,36 @@ ansible-galaxy collection install -r requirements.yml
 cp inventory/hosts.yml.example inventory/hosts.yml
 $EDITOR inventory/hosts.yml    # add your servers
 ```
+
+### Connection identity (`ansible.cfg`)
+
+`ansible.cfg` ships with placeholder connection vars under `[all:vars]` —
+replace them with the SSH user and private key Ansible should connect with:
+
+```ini
+[all:vars]
+ansible_user=<whoami_user>                       # e.g. the output of `whoami` on the target
+ansible_ssh_private_key_file=~/.ssh/<your_ssh_key>   # e.g. ~/.ssh/id_ed25519
+```
+
+These are control-node-local defaults; per-host overrides still belong in
+`inventory/hosts.yml`.
+
+### Loading your key into ssh-agent
+
+So Ansible (and plain `ssh`) can authenticate without retyping your passphrase
+on every connection, start an agent for the session and add your key:
+
+```bash
+eval "$(ssh-agent -s)"          # start the agent, export its env vars
+ssh-add ~/.ssh/<your_ssh_key>   # add the key matching ansible_ssh_private_key_file
+ssh-add -l                      # confirm it's loaded
+```
+
+`eval` is required because `ssh-agent -s` prints shell commands (the socket
+path and PID) that must be evaluated in your current shell — running it without
+`eval` just dumps the variables instead of setting them. The agent lives for
+the shell session; add the two lines to your shell rc to make it automatic.
 
 ## Everyday use
 
@@ -54,6 +84,7 @@ ansible-playbook site.yml --tags shell
 |-----------------------------------------|--------------------------------------|
 | `~/.local/bin/`                         | Static binaries (rg, fd, btop, …)    |
 | `~/.local/share/nvim-linux-x86_64/`     | Full neovim install                  |
+| `~/.local/share/fonts/`                 | Nerd Fonts (JetBrainsMono)           |
 | `~/.config/nvim/`                       | LazyVim starter (only if absent)     |
 | `~/.bashrc`                             | Thin rc that sources `~/.bashrc.d/*` |
 | `~/.bashrc.d/{aliases,fzf,starship}.sh` | Templated shell fragments            |
@@ -65,8 +96,8 @@ Your existing `~/.bashrc` is preserved once at `~/.bashrc.pre-clworkstation`.
 
 ```
 CLWorkstation/
-├── ansible.cfg                 ← sets inventory, disables host-key checks
-├── site.yml                    ← top-level play: common → tools → shell → neovim
+├── ansible.cfg                 ← inventory, host-key checks, [all:vars] conn identity
+├── site.yml                    ← top-level play: common → tools → fonts → shell → neovim
 ├── requirements.yml            ← ansible-galaxy collections
 ├── inventory/
 │   ├── hosts.yml.example       ← copy to hosts.yml (gitignored)
@@ -74,11 +105,13 @@ CLWorkstation/
 ├── group_vars/workstations.yml ← feature toggles + path vars
 ├── vars/
 │   ├── tools.yml               ← tool catalog: pinned versions + release URLs
+│   ├── fonts.yml               ← Nerd Font catalog: pinned versions + release URLs
 │   ├── Archlinux.yml           ← distro base packages
 │   └── Debian.yml
 ├── roles/
 │   ├── common/                 ← creates ~/.local/bin, ~/.config, …
 │   ├── tools/                  ← downloads + installs binaries from tools.yml
+│   ├── fonts/                  ← installs Nerd Fonts from fonts.yml into ~/.local/share/fonts
 │   ├── shell/                  ← templates bashrc + .bashrc.d/*.sh
 │   └── neovim/                 ← clones LazyVim starter if absent
 ├── molecule/default/           ← Arch + Ubuntu container tests (prepare → converge → verify)
@@ -89,6 +122,23 @@ CLWorkstation/
 
 Edit `vars/tools.yml`, bump `version` and `url`, delete the matching sentinel
 file under `~/.cache/clworkstation/` on the target, then rerun the playbook.
+
+## Fonts
+
+The `fonts` role installs Nerd Fonts per-user into `~/.local/share/fonts` and
+refreshes the user font cache with `fc-cache` (when `fontconfig` is present).
+The catalog lives in `vars/fonts.yml` and tracks the same Nerd Font Omarchy
+uses by default — **JetBrainsMono Nerd Font**.
+
+```bash
+# Just (re)install fonts:
+ansible-playbook site.yml --tags fonts
+```
+
+Pin a new release the same way as tools: bump `version`/`url` in
+`vars/fonts.yml`, delete the matching `font-<name>-<version>.installed` sentinel
+on the target, and rerun. Set `enable_nerd_fonts: false` in
+`group_vars/workstations.yml` to skip the role entirely.
 
 ## Local testing
 

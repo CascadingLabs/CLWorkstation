@@ -1,0 +1,77 @@
+---
+# Install each Nerd Font from vars/fonts.yml into ~/.local/share/fonts.
+#
+# Strategy per font (mirrors the tools role's sentinel/versioning model):
+#   1. Skip if sentinel file exists at cache/font-<name>-<version>.installed
+#   2. Extract the release archive into ~/.local/share/fonts/<name>
+#   3. Refresh the font cache with fc-cache (only if fontconfig is present)
+#   4. Write the sentinel
+#
+# Everything is per-user; no sudo and no system font dirs are touched.
+
+- name: Configure Nerd Fonts
+  when: enable_nerd_fonts
+  block:
+    - name: Check sentinel for each font
+      ansible.builtin.stat:
+        path: "{{ user_cache_dir }}/font-{{ item.name }}-{{ item.version }}.installed"
+      loop: "{{ nerd_fonts }}"
+      loop_control:
+        label: "{{ item.name }}-{{ item.version }}"
+      register: _font_sentinels
+
+    - name: Build list of fonts still needing install
+      ansible.builtin.set_fact:
+        fonts_to_install: >-
+          {{ _font_sentinels.results
+             | rejectattr('stat.exists')
+             | map(attribute='item')
+             | list }}
+
+    - name: Report pending font installs
+      ansible.builtin.debug:
+        msg: "Installing fonts: {{ fonts_to_install | map(attribute='name') | list }}"
+      when: fonts_to_install | length > 0
+
+    - name: Ensure per-user font dirs exist
+      ansible.builtin.file:
+        path: "{{ user_fonts_dir }}/{{ item.name }}"
+        state: directory
+        mode: "0755"
+      loop: "{{ fonts_to_install }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Extract font archives into ~/.local/share/fonts
+      ansible.builtin.unarchive:
+        src: "{{ item.url }}"
+        dest: "{{ user_fonts_dir }}/{{ item.name }}"
+        remote_src: true
+      loop: "{{ fonts_to_install }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    # fontconfig isn't guaranteed on a headless server. If fc-cache is missing
+    # the font files are still installed and usable; we just can't refresh the
+    # index here, so skip it rather than fail the play.
+    - name: Locate fc-cache
+      ansible.builtin.command: which fc-cache
+      register: _fc_cache
+      changed_when: false
+      failed_when: false
+
+    - name: Refresh the user font cache
+      ansible.builtin.command: fc-cache --force "{{ user_fonts_dir }}"
+      changed_when: true
+      when:
+        - fonts_to_install | length > 0
+        - _fc_cache.rc == 0
+
+    - name: Write font sentinel files
+      ansible.builtin.copy:
+        dest: "{{ user_cache_dir }}/font-{{ item.name }}-{{ item.version }}.installed"
+        content: "{{ item.url }}\n"
+        mode: "0644"
+      loop: "{{ fonts_to_install }}"
+      loop_control:
+        label: "{{ item.name }}-{{ item.version }}"
