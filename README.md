@@ -49,6 +49,22 @@ ansible_ssh_private_key_file=~/.ssh/<your_ssh_key>   # e.g. ~/.ssh/id_ed25519
 These are control-node-local defaults; per-host overrides still belong in
 `inventory/hosts.yml`.
 
+### First time load, no ssh key
+
+Ansible has two password auth methods: SSH key and password.
+```bash
+ansible-playbook site.yml --limit <host> --check --diff --ask-pass --ask-become-pass
+# just make sure that that the host is in host.yml already
+# I have my public key in roles/common/files/id_ed25519.pub, so make sure you don't want to use a different key
+```
+
+### Loading your key into ssh-agent
+
+So Ansible (and plain `ssh`) can authenticate without retyping your passphrase
+on every connection, start an agent for the session and add your key:
+
+```
+
 ### Loading your key into ssh-agent
 
 So Ansible (and plain `ssh`) can authenticate without retyping your passphrase
@@ -56,7 +72,6 @@ on every connection, start an agent for the session and add your key:
 
 ```bash
 eval "$(ssh-agent -s)"          # start the agent, export its env vars
-ssh-add ~/.ssh/<your_ssh_key>   # add the key matching ansible_ssh_private_key_file
 ssh-add -l                      # confirm it's loaded
 ```
 
