@@ -41,7 +41,6 @@ TODO.md
 # IDEs & Editors
 # ==========================================
 .vscode/
-.zed/
 .idea/
 *.swp
 *.swo
