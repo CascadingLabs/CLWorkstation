@@ -23,6 +23,12 @@
         - lazydocker
         - nvim
 
+    - name: Tailscale system package binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/tailscale
+      register: _tailscale_bin
+      failed_when: not _tailscale_bin.stat.exists or not _tailscale_bin.stat.executable
+
     - name: bashrc.d fragments installed
       ansible.builtin.stat:
         path: "{{ ansible_env.HOME }}/.bashrc.d/{{ item }}"

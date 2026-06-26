@@ -3,6 +3,14 @@
 enable_shell_rc: true
 enable_neovim_config: true
 enable_nerd_fonts: true
+enable_tailscale: true
+
+# Tailscale/Tailnet enrollment. The auth key is read from the control-node
+# environment at playbook runtime and is never stored in repo files.
+tailscale_auth_key_env_var: TAILNET_AUTH_KEY
+# Optional ACL tags to advertise during `tailscale up`. Leave empty unless the
+# tailnet ACL or auth key is allowed to assign the tag.
+tailscale_advertise_tags: []
 
 # Where per-user binaries land. Must be on PATH (shell role ensures this).
 user_bin_dir: "{{ ansible_env.HOME }}/.local/bin"

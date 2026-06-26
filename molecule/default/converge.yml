@@ -14,7 +14,7 @@
     - name: Load distro-specific vars
       ansible.builtin.include_vars: "{{ item }}"
       with_first_found:
-        - "../../vars/{{ ansible_os_family }}.yml"
+        - "../../vars/{{ ansible_facts['os_family'] }}.yml"
         - "../../vars/default.yml"
 
     - name: Load tool catalog
@@ -32,3 +32,5 @@
     - role: fonts
     - role: shell
     - role: neovim
+    - role: tailscale
+      when: enable_tailscale | bool

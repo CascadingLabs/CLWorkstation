@@ -89,6 +89,10 @@ ansible-playbook site.yml --limit <hostname> --check --diff --ask-become-pass
 # Real run, all hosts:
 ansible-playbook site.yml
 
+# Join hosts to your Tailnet during the run (auth key stays local):
+export TAILNET_AUTH_KEY='tskey-auth-...'
+ansible-playbook site.yml --tags tailscale --ask-become-pass
+
 # Just refresh the shell config:
 ansible-playbook site.yml --tags shell
 ```
@@ -154,6 +158,23 @@ Pin a new release the same way as tools: bump `version`/`url` in
 `vars/fonts.yml`, delete the matching `font-<name>-<version>.installed` sentinel
 on the target, and rerun. Set `enable_nerd_fonts: false` in
 `group_vars/workstations.yml` to skip the role entirely.
+
+## Tailscale / Tailnet enrollment
+
+The `tailscale` role installs Tailscale with sudo, enables `tailscaled`, then
+runs `tailscale up` only when the host is not already connected. The Tailnet auth
+key is read at runtime from the control-node environment variable configured by
+`tailscale_auth_key_env_var` (default: `TAILNET_AUTH_KEY`) and is marked
+`no_log`, so it is not stored in inventory or task output.
+
+```bash
+export TAILNET_AUTH_KEY='tskey-auth-...'
+ansible-playbook site.yml --tags tailscale --ask-become-pass
+```
+
+Advertised tags are configured in `group_vars/workstations.yml` via
+`tailscale_advertise_tags`. Leave the list empty unless the tailnet ACL or auth
+key is allowed to assign the tag.
 
 ## Local testing
 
