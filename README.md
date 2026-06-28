@@ -17,6 +17,9 @@
 
 Ansible playbook that installs a consistent SSH toolkit on any Linux server (Arch or Ubuntu) **per-user** — no root required for the tools themselves. One command and a fresh server has `lazydocker`, `btop`, `nvim` (+ LazyVim), `lazygit`, `ripgrep`, `fd`, `fzf`, `bat`, `eza`, `zoxide`, `starship`, the **JetBrainsMono Nerd Font** (Omarchy's default, so prompts/icons render correctly), plus a tested bash alias set.
 
+> [!WARNING]
+> CLWorkstation is research tooling for API design and web reverse engineering. **You assume all legal risk for how you use it.** Respect `robots.txt`, rate limits, and IP bans; and please don't bypass them with Tor or a VPN. Read [DISCLAIMER.md](DISCLAIMER.md) before pointing it at anything.
+
 Nothing lands outside `$HOME`, so coworkers sharing the box are untouched.
 
 ## How it runs
@@ -232,6 +235,7 @@ prerequisites that the playbook itself assumes a real workstation already has.
 - **Support:** see [SUPPORT.md](SUPPORT.md)
 - **Security:** see [SECURITY.md](SECURITY.md)
 - **Code of Conduct:** see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- **Responsible use:** see [DISCLAIMER.md](DISCLAIMER.md)
 
 ## Contact
 
